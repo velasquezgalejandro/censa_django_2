@@ -1,12 +1,12 @@
 from django import forms
+from .models import Producto, Cliente
 
-class ProductoForm(forms.Form):
-    nombre = forms.CharField(max_length=100)
-    descripcion = forms.CharField(widget=forms.Textarea)
-    precio = forms.DecimalField(max_digits=10, decimal_places=2)
-    stock = forms.IntegerField()
+class ProductoModelForm(forms.ModelForm):
+    class Meta:
+        model = Producto
+        fields = ['nombre', 'descripcion', 'precio', 'stock']
 
-class ClienteForm(forms.Form):
-    nombre = forms.CharField(max_length=100)
-    email = forms.CharField(widget=forms.Textarea)
-    telefono = forms.DecimalField(max_digits=10, decimal_places=2)
+class ClienteModelForm(forms.ModelForm):
+    class Meta:
+        model = Cliente
+        fields = ['nombre', 'email', 'telefono']

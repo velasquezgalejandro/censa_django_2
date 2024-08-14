@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Pagina de incio</title>
+</head>
+<body>
+  <h1>Bienvenido a la tienda</h1>
+  <p>Visita nuestras secciones:</p>
+  <ul>
+    <li><a href="{% url 'listar_productos' %}">Productos</a></li>
+    <li><a href="{% url 'agregar_producto' %}">agregar producto</a></li>
+    <li><a href="{% url 'listar_clientes' %}">Clientes</a></li>
+    <li><a href="{% url 'agregar_cliente' %}">agregar cliente</a></li>
+  </ul>
+</body>
+</html>
