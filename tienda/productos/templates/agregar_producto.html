@@ -8,6 +8,15 @@
     <form method="post">
         {% csrf_token %}
         {{ form.as_p }} 
+        {% if form.errors %}
+             <ul>
+                {% for field in form %}
+                {% if field.errors %}  <!-- Muestra errores específicos de cada campo -->
+                    <li>{{ field.label }}: {{ field.errors }}</li>
+                {% endif %}
+                {% endfor %}
+            </ul>
+        {% endif %}
         <button type="submit"> Guardar Producto </button>
     </form>
     <br> 

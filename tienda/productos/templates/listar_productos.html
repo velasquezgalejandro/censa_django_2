@@ -10,5 +10,10 @@
         <li>{{ producto.nombre }} - {{ producto.precio }} - {{ producto.descripcion }} - {{ producto.stock }}</li>
         {% endfor %}
     </ul>
+    <br>
+    <a href="{% url 'agregar_cliente' %}">Agregar Nuevo Cliente</a>
+    <br>
+    <br>
+    <a href="{% url 'listar_productos' %}">Ver Productos</a>
 </body>
 </html>
