@@ -5,15 +5,27 @@
 </head>
 <body>
     <h1>lista de Productos</h>
+        <form method="get">
+            Precio minimo: <input type="number" name="precio_min">
+            Precio maximo: <input type="number" name="precio_max">
+            <button type="submit">Filtrar por precio</button>
+        </form>
+         <form method="get">
+            Buscar: <input type="text" name="q">
+            <button type="submit">Filtrar por nombre o descripcion</button>
+        </form>
     <ul>
         {% for producto in productos %}
         <li>{{ producto.nombre }} - {{ producto.precio }} - {{ producto.descripcion }} - {{ producto.stock }}</li>
         {% endfor %}
     </ul>
     <br>
-    <a href="{% url 'agregar_cliente' %}">Agregar Nuevo Cliente</a>
+    <a href="{% url 'agregar_producto' %}">Agregar Nuevo Producto</a>
     <br>
     <br>
-    <a href="{% url 'listar_productos' %}">Ver Productos</a>
+    <a href="{% url 'listar_clientes' %}">Ver Clientes</a>
+    <br>
+    <br>
+    <a href="{% url 'inicio' %}">Volver inicio</a>
 </body>
 </html>
