@@ -17,7 +17,7 @@ def listar_productos(request):
     paginator = Paginator(productos_list, 10)
 
     page_number = request.GET.get('page')
-    productos= paginator.get_page('page_number')
+    productos = paginator.get_page(page_number)
 
     if precio_min and precio_max:
         productos_list = productos_list.filter(precio__gte = precio_min, precio__lte= precio_max)
