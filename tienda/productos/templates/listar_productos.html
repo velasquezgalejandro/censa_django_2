@@ -20,6 +20,16 @@
         {% endfor %}
     </ul>
     <br>
+    <div>
+        {% if productos.has_previous %}
+            <a href="?page={{ productos.previous_page_number }}">Anterior</a>
+        {% endif %}
+        <span>Pagina {{ productos.number }} de {{ productos.paginator.num_pages }}</span>
+        {% if productos.has_next %}
+            <a href="?page={{ productos.next_page_number }}">Siguente</a>
+        {% endif %}
+    </div>
+    <br>
     <a href="{% url 'agregar_producto' %}">Agregar Nuevo Producto</a>
     <br>
     <br>
