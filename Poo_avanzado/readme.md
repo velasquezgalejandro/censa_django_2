@@ -25,3 +25,7 @@ def editar_producto(request, pk):
     else 
         form = ProductoForm(instance=producto) # lo mismo de los datos para mantener
         return render(reques, 'html', {form: form}) #renderiza vista
+
+en urls 
+
+path('productos/editar/<int:pk>', editar_producto, name='editar_producto') #para las que necesiten p
