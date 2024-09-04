@@ -34,3 +34,11 @@ class Producto(models.Model):
 
     def __str__(self):
         return str(self.nombre)
+
+class DetalleProducto(models.Model):
+    producto = models.OneToOneField(Producto, on_delete=models.CASCADE)
+    especifiacaciones = models.TextField()
+    fecha_vencimiento = models.DateField(null=True, blank=True)
+
+    def __str__(self):
+        return f"Detalles de {self.producto.nombre}"
