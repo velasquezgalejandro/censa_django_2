@@ -31,13 +31,14 @@ class Producto(models.Model):
     cantidad = models.IntegerField()
     precio = models.DecimalField(max_digits=10, decimal_places=2)
     descripcion = models.TextField()
+    detalleProducto = models.OneToOneField('DetalleProducto', on_delete=models.CASCADE, related_name='porducto_detalle', null=True)
 
     def __str__(self):
         return str(self.nombre)
 
 class DetalleProducto(models.Model):
     producto = models.OneToOneField(Producto, on_delete=models.CASCADE)
-    especifiacaciones = models.TextField()
+    especificaciones = models.TextField()
     fecha_vencimiento = models.DateField(null=True, blank=True)
 
     def __str__(self):

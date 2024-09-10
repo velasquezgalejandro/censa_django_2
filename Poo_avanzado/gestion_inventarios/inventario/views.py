@@ -7,44 +7,91 @@ from .forms import ProductoForm, CategoriaForm, ProveedorForm, DetalleProductoFo
 def inicio(request):
     return render(request, 'inventario/inicio.html')
 
-
 def listar_productos(request):
-    productos = Producto.objects.all()
+    # Obtiene todos los productos de la base de datos, incluyendo sus detalles relacionados,
+    # utilizando `prefetch_related` para optimizar la consulta y evitar múltiples consultas adicionales.
+    productos = Producto.objects.prefetch_related('detalleproducto').all()
+
+    # Renderiza la plantilla 'inventario/listar_productos.html' y pasa la lista de productos al contexto
+    # para que puedan ser utilizados dentro del template.
     return render(request, 'inventario/listar_productos.html', {'productos': productos})
+
+
+# def agregar_producto(request):
+#     if request.method == 'POST':
+#         producto_form = ProductoForm(request.POST)
+#         detalle_form = DetalleProductoForm(request.POST)
+#         if producto_form.is_valid() and detalle_form.is_valid():
+#             producto = producto_form.save()
+#             detalle = detalle_form.save(commit=False)
+#             detalle.producto = producto
+#             detalle.save()
+#             producto_form.save_m2m() # guardar relaciones muchos a muchos.
+#             return redirect('listar_productos')
+#     else:
+#         producto_form = ProductoForm()
+#         detalle_form = DetalleProductoForm()
+#     return render(request, 'inventario/agregar_producto.html', {
+#         'producto_form': producto_form,
+#         'detalle_form': detalle_form
+#     })
 
 def agregar_producto(request):
     if request.method == 'POST':
         producto_form = ProductoForm(request.POST)
-        detalle_form =  DetalleProductoForm(request.POST)
+        detalle_form = DetalleProductoForm(request.POST)
         if producto_form.is_valid() and detalle_form.is_valid():
-            producto = producto_form.save()
+            producto = producto_form.save(commit=False)
+            producto.save()
+            producto_form.save_m2m()
+
+            detalle = detalle_form.save(commit=False)
+            detalle.producto = producto
+            detalle.save
+
+            return redirect('listar_productos')
+
+    else:
+        producto_form = ProductoForm()
+        detalle_form = DetalleProductoForm()
+
+    return render(request, 'inventario/agregar_producto.html', {
+         'producto_form': producto_form,
+         'detalle_form': detalle_form
+     })
+
+
+def editar_producto(request, pk):
+    producto = get_object_or_404(Producto, pk=pk)
+    try:
+        detalle = producto.detalleproducto
+    except DetalleProducto.DoesNotExist:
+        detalle = None
+
+    if request.method == 'POST':
+        producto_form = ProductoForm(request.POST, instance=producto)
+        detalle_form = DetalleProductoForm(request.POST, instance=detalle)
+        if producto_form.is_valid() and detalle_form.is_valid():
+            producto = producto_form.save(commit=False)
+            producto_form.save()
+            producto_form.save_m2m() # guardar relaciones muchos a muchos.
             detalle = detalle_form.save(commit=False)
             detalle.producto = producto
             detalle.save()
             return redirect('listar_productos')
-    else: 
-        producto_form = ProductoForm()
-        detalle_form = DetalleProductoForm()
-    return render(request, 'inventario/agregar_producto.html', {'producto_form': producto_form , 'detalle_form': detalle_form})
-
-        
-
-def editar_producto(request, pk):
-    producto = get_object_or_404(Producto, pk=pk)
-    if request.method == 'POST':
-        form = ProductoForm(request.POST, instance=producto)
-        if form.is_valid():
-            form.save()
-            return redirect('listar_productos')
     else:
-        form = ProductoForm(instance=producto)
-    return render(request, 'inventario/editar_producto.html', {'form': form})
+        producto_form = ProductoForm(instance=producto)
+        detalle_form = DetalleProductoForm(instance=detalle)
+    return render(request, 'inventario/editar_producto.html', {
+        'producto_form': producto_form,
+        'detalle_form': detalle_form
+    })
 
 def eliminar_producto(request, pk):
     producto = get_object_or_404(Producto, pk=pk)
     if request.method == 'POST':
         producto.delete()
-        return redirect('listar_producto')
+        return redirect('listar_productos')
     return render(request, 'inventario/eliminar_producto.html', {'producto': producto})
 
 # Vistas para Categoria
@@ -60,7 +107,7 @@ def agregar_categoria(request):
             return redirect('listar_categorias')
     else:
         form = CategoriaForm()
-    return render(request, 'inventario/agregar_categorias.html', {'form': form})
+    return render(request, 'inventario/agregar_categoria.html', {'form': form})
 
 def editar_categoria(request, pk):
     categoria = get_object_or_404(Categoria, pk=pk)
@@ -112,5 +159,3 @@ def eliminar_proveedor(request, pk):
         proveedor.delete()
         return redirect('listar_proveedores')
     return render(request, 'inventario/eliminar_proveedor.html', {'proveedor': proveedor})
-
-
