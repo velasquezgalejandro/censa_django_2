@@ -1,6 +1,9 @@
+import csv
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import Producto, Categoria, Proveedor, DetalleProducto
-from .forms import ProductoForm, CategoriaForm, ProveedorForm, DetalleProductoForm
+from django.utils.dateparse import parse_date
+from django.http import HttpResponse
+from .models import Producto, Categoria, Proveedor, DetalleProducto, Ventas, Cliente
+from .forms import ProductoForm, CategoriaForm, ProveedorForm, DetalleProductoForm, ClienteForm, VentasForm
 
 # Create your views here.
 
@@ -159,3 +162,69 @@ def eliminar_proveedor(request, pk):
         proveedor.delete()
         return redirect('listar_proveedores')
     return render(request, 'inventario/eliminar_proveedor.html', {'proveedor': proveedor})
+
+def listar_ventas(request):
+    ventas = Ventas.objects.all().select_related('producto', 'cliente')
+    return render(request, 'inventario/listar_ventas.html', {'ventas': ventas})
+
+def registrar_venta(request):
+    if request.method == 'POST':
+        form = VentasForm(request='POST')
+        if form.is_valid():
+            venta = form.save(commit=False)
+            producto = venta.producto
+            venta.total = producto.precio * venta.cantidad
+            venta.save()
+            producto.stock -= venta.cantidad
+            producto.save()
+            return redirect('listar_ventas')
+        else:
+            form = VentasForm()
+        return render(request, 'inventario/registrar_venta-html', {'form': form})
+
+def reporte_ventas(request):
+    ventas = Ventas.objects.all()
+    fecha_inicio = request.GET.get('fecha_inicio')
+    fecha_fin = request.GET.get('fecha_fin')
+    cliente_id = request.GET.get('cliente_id')
+    producto_id = request.GET.get('producto_id')
+
+    if fecha_inicio and fecha_fin:
+        ventas = ventas.filter(fecha_venta__range=[parse_date(fecha_inicio), parse_date(fecha_fin)])
+
+    if cliente_id:
+        ventas = ventas.filter(cliente_id=cliente_id)
+
+    if producto_id:
+        ventas = ventas.filter(producto_id=producto_id)
+
+    return render(request, 'inventario/reporte_ventas.html', {'ventas': ventas})
+
+def exportar_reporte_ventas_csv(request):
+    ventas = Ventas.objects.all()
+    fecha_inicio = request.GET.get('fecha_inicio')
+    fecha_fin = request.GET.get('fecha_fin')
+    cliente_id = request.GET.get('cliente_id')
+    producto_id = request.GET.get('producto_id')
+
+    if fecha_inicio and fecha_fin:
+        ventas = ventas.filter(fecha_venta__range=[parse_date(fecha_inicio), parse_date(fecha_fin)])
+
+    if cliente_id:
+        ventas = ventas.filter(cliente_id=cliente_id)
+
+    if producto_id:
+        ventas = ventas.filter(producto_id=producto_id)
+     
+    response = HttpResponse(content_type, 'text/csv')
+    response['Content.Disposition'] = 'attachment'
+
+    filename="reporte_ventas.csv"
+
+    writer = csv.writer(response)
+    writer.writerow(['fecha de venta', 'producto', 'cliente', 'cantidad', 'total', ])
+
+    for venta in ventas:
+        writer.writerow([venta.fecha_venta, venta.producto.nombre, venta.cliente.nombre, venta.cantidad, venta.total,])
+
+    return response

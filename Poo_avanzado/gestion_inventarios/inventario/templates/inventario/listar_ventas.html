@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lista de Ventas</title>
+</head>
+<body>
+    <h1>Lista de ventas</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Producto</th>
+                <th>Cliente</th>
+                <th>Cantidad</th>
+                <th>Total</th>
+                <th>Fecha de Venta</th>
+            </tr>
+        </thead>
+        <tbody>
+            { % for venta in ventas % }
+            <tr>
+                <td>{ venta.producto.nombre }</td>
+                <td>{ venta.cliente.nombre }</td>
+                <td>{ venta.cantidad }</td>
+                <td>{ venta.total }</td>
+                <td>{ venta.fecha_venta }</td>
+            </tr>
+            { % endfor % }
+        </tbody>
+    </table>
+</body>
+</html>
